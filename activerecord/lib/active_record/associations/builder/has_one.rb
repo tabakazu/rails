@@ -32,15 +32,12 @@ module ActiveRecord::Associations::Builder # :nodoc:
       end
     end
 
-    def self.touch_record(o, name, touch)
-      record = o.send name
+    def self.touch_record(record, name, touch)
+      instance = record.association(name).target
 
-      return unless record && record.persisted?
-
-      if touch != true
-        record.touch(touch)
-      else
-        record.touch
+      if instance&.persisted?
+        touch != true ?
+          instance.touch(touch) : instance.touch
       end
     end
 
@@ -48,10 +45,7 @@ module ActiveRecord::Associations::Builder # :nodoc:
       name  = reflection.name
       touch = reflection.options[:touch]
 
-      callback = lambda { |record|
-        HasOne.touch_record(record, name, touch)
-      }
-
+      callback = -> record { HasOne.touch_record(record, name, touch) }
       model.after_create callback, if: :saved_changes?
       model.after_update callback, if: :saved_changes?
       model.after_destroy callback

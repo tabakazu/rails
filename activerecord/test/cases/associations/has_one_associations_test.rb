@@ -712,6 +712,15 @@ class HasOneAssociationsTest < ActiveRecord::TestCase
     }
   end
 
+  def test_polymorphic_has_one_with_touch_option_on_create_wont_cache_assocation_so_fetching_after_transaction_commit_works
+    assert_queries(3) {
+      chef = Chef.create(employable: DrinkDesignerWithPolymorphicTouchChef.new)
+      employable = chef.employable
+
+      assert_equal chef, employable.chef
+    }
+  end
+
   def test_has_one_with_touch_option_on_update
     new_club = Club.create(name: "1000 Oaks")
     new_club.create_membership
