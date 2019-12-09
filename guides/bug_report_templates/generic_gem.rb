@@ -13,11 +13,14 @@ end
 
 require "active_support"
 require "active_support/core_ext/object/blank"
+require "active_support/testing/assertions"
 require "minitest/autorun"
 
 class BugTest < Minitest::Test
+  include ActiveSupport::Testing::Assertions
+
   def test_stuff
     assert "zomg".present?
-    refute "".present?
+    assert_not "".present?
   end
 end
